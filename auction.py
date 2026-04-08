@@ -45,3 +45,13 @@ class AuctionRound:
             print(f" {player} won at {price} (Profit: {price - self.costs[player]:.2f})")
         else:
             print(" No winner")
+
+
+    def analysis(self):
+        unique_players = len({player for player, _ in self.bids})
+        return {
+            "total bids": self.bst.total_bids,
+            "revenue": round(self.seller_revenue, 2),
+            "avgerage cost": round(self.seller_revenue / unique_players, 2) if unique_players else 0,
+            "winner": self.winner,
+    }
