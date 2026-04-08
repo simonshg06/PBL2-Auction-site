@@ -25,3 +25,11 @@ class Cheapskate(Strategy):
         prices = range(max_price + 1)
         weights = [math.exp(-0.5 * k) for k in prices]
         return random.choices(prices, weights=weights)[0]
+    
+class Accountant(Strategy):
+    name = "Accountant"
+
+    def bid(self, round_number, history, base_cost, alpha, max_price=20):
+        def score(p):
+            return p - (base_cost + alpha / (p + 1)) + random.gauss(0, 0.5)
+        return max(range(max_price + 1), key=score)
