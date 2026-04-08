@@ -14,4 +14,11 @@ class AuctionRound:
         self.winner, self.seller_revenue = None, 0.0
 
     def place_bid(self, player, price):
+        if not isinstance(price, int) or price < 0: raise ValueError("Invalid price") #detect error#
+        self.bst.insert(price, player)
+        self.bids.append((player, price))
+        cost = bid_cost(price, self.base_cost, self.alpha)     #define cost#
+        self.costs[player] = self.costs.get(player, 0) + cost
+        self.seller_revenue += cost
+
 
