@@ -18,3 +18,10 @@ class DiceRoller(Strategy):
     def bid(self, round_number, history, base_cost, alpha, max_price=20):
         return random.randint(0, max_price)
 
+class Cheapskate(Strategy):
+    name = "Cheapskate"
+
+    def bid(self, round_number, history, base_cost, alpha, max_price=20):
+        prices = range(max_price + 1)
+        weights = [math.exp(-0.5 * k) for k in prices]
+        return random.choices(prices, weights=weights)[0]
