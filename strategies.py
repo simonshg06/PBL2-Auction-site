@@ -33,3 +33,19 @@ class Accountant(Strategy):
         def score(p):
             return p - (base_cost + alpha / (p + 1)) + random.gauss(0, 0.5)
         return max(range(max_price + 1), key=score)
+    
+class Historian(Strategy):
+    name = "Historian"
+
+    def bid(self, round_number, history, base_cost, alpha, max_price=20):
+        if not history:
+            return random.randint(1, max_price // 2)
+        win_freq = {}
+        for r in history[-50:]:
+            if r["winner"]:
+                wp = r["winner"][0]
+                win_freq[wp] = win_freq.get(wp, 0) + 1
+        if not win_freq:
+            return random.randint(0, max_price)
+        base = random.choices(list(win_freq), weights=win_freq.values())[0]
+        return max(0, min(max_price, base + random.randint(-2, 2)))
