@@ -24,3 +24,8 @@ class AuctionRound:
     def load_from_list(self, bid_list):
         for player, price in bid_list:
             self.place_bid(player, price)
+
+    def load_from_csv(self, filepath):
+        with open(filepath) as f:
+            for player, price in csv.reader(f):
+                self.place_bid(player.strip(), int(price))
