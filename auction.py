@@ -19,7 +19,7 @@ class AuctionRound:
         self.bids.append((player, price))
         cost = bid_cost(price, self.base_cost, self.alpha)     # calculate this bid's cost
         self.costs[player] = self.costs.get(player, 0) + cost # accumulate player's total cost
-        self.seller_revenue += cost
+        self.seller_revenue += cost # seller earns every bid cost
 
     def load_from_list(self, bid_list): #  load from a Python list
         for player, price in bid_list:
@@ -50,8 +50,8 @@ class AuctionRound:
     def analysis(self):
         unique_players = len({player for player, _ in self.bids}) # count distinct players
         return {
-            "total bids": self.bst.total_bids,
+            "total_bids": self.bst.total_bids,
             "revenue": round(self.seller_revenue, 2),
-            "avgerage cost": round(self.seller_revenue / unique_players, 2) if unique_players else 0,
+            "avg_cost": round(self.seller_revenue / unique_players, 2) if unique_players else 0,
             "winner": self.winner,
     }
