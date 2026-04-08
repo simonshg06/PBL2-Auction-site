@@ -1,5 +1,5 @@
 import csv
-from bst import BidBST
+from BST import BidBST
 
 
 def bid_cost(price, base_cost=1.0, alpha=10.0):
@@ -29,3 +29,19 @@ class AuctionRound:
         with open(filepath) as f:
             for player, price in csv.reader(f):
                 self.place_bid(player.strip(), int(price))
+
+
+    def resolve(self):
+        res = self.bst.find_lowest_unique()
+        self.winner = res if res[0] is not None else None
+        return self.winner
+
+    def summary(self):
+        print(f"\n{' SUMMARY ':═^30}")
+        self.bst.display()
+        print(f"Revenue: {self.seller_revenue:.2f} | Bids: {self.bst.total_bids}")
+        if self.winner:
+            price, player = self.winner
+            print(f" {player} won at {price} (Profit: {price - self.costs[player]:.2f})")
+        else:
+            print(" No winner")
