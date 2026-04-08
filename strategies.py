@@ -63,3 +63,24 @@ class Hipster(Strategy):
         all_prices = sorted(range(max_price + 1), key=lambda p: price_freq.get(p, 0))
         cutoff = max(1, (max_price + 1) // 3)
         return random.choice(all_prices[:cutoff])
+    
+class Human(Strategy):
+    name = "Human"
+
+    def __init__(self, player_name="Human"):
+        self.player_name = player_name
+
+    def bid(self, round_number, history, base_cost, alpha, max_price=20):
+        from auction import bid_cost
+        print(f"\n── Your turn, {self.player_name} (Round {round_number + 1}) ──")
+        print(f"  Bid range: 0–{max_price}  |  Cost: {base_cost} + {alpha}/(price+1)")
+        for p in [0, 1, 2, 5, 10, max_price]:
+            print(f"    price={p:>3} → cost={bid_cost(p, base_cost, alpha):.2f}")
+        while True:
+            try:
+                price = int(input(f"  Enter your bid (0–{max_price}): "))
+                if 0 <= price <= max_price:
+                    return price
+            except ValueError:
+                pass
+            print(f"  ⚠  Please enter a number between 0 and {max_price}.")
