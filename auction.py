@@ -21,4 +21,6 @@ class AuctionRound:
         self.costs[player] = self.costs.get(player, 0) + cost
         self.seller_revenue += cost
 
-
+    def load_from_list(self, bid_list):
+        for player, price in bid_list:
+            self.place_bid(player, price)
