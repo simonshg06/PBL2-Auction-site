@@ -23,4 +23,8 @@ class Simulation:
         self.round_history = []
         self.rounds_played = 0
         self.no_winner_rounds = 0
-        
+
+    def run(self, n_rounds=500, verbose=False, verbose_every=100):
+        for r in range(n_rounds):
+            self._run_one_round(r, verbose and r % verbose_every == 0)
+        self.rounds_played += n_rounds
