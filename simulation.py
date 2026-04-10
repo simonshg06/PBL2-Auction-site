@@ -54,3 +54,25 @@ class Simulation:
             self.no_winner_rounds += 1
         if verbose:
             auction.summary()
+
+
+    def report(self):
+        n = self.rounds_played
+        total_revenue = sum(self.seller_revenues)
+        print("\n" + "═" * 55)
+        print(f"  SIMULATION REPORT — {n} rounds")
+        print("═" * 55)
+        print(f"  Parameters: base_cost={self.base_cost}, alpha={self.alpha}, max_price={self.max_price}")
+        print(f"  No-winner: {self.no_winner_rounds} ({100*self.no_winner_rounds/n:.1f}%)")
+        print(f"  Revenue: {total_revenue:.2f} total, {total_revenue/n:.2f} avg/round")
+        
+        header = f"\n  {'Player':<14} {'Strategy':<12} {'Wins':>5} {'Win%':>6} {'Spent':>9} {'Profit':>12}"
+        print(header)
+        print("  " + "-" * (len(header) - 3))
+        for name, strategy in self.players:
+            ps = self.stats[name]
+            # print player stats with percentage win rate and average spending
+            print(f"  {name:<14} {strategy.name:<12} {ps.wins:>5} {100*ps.wins/n:>5.1f}% "
+                  f"{ps.total_spent/n:>9.3f} {ps.total_profit:>12.2f}")
+        print("═" * 55)
+        self._report_bst_health()
