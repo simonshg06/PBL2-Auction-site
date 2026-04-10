@@ -15,3 +15,12 @@ class Simulation:
         self.alpha = alpha
         self.max_price = max_price
         self._reset_stats()
+
+    def _reset_stats(self): # create empty PlayerStats for each player
+        
+        self.stats = {name: PlayerStats() for name, _ in self.players}
+        self.seller_revenues = []
+        self.round_history = []
+        self.rounds_played = 0
+        self.no_winner_rounds = 0
+        
