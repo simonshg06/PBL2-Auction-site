@@ -83,4 +83,7 @@ class Human(Strategy):
                     return price
             except ValueError:
                 pass
-            print(f"  ⚠  Please enter a number between 0 and {max_price}.")
+            print(f"   Please enter a number between 0 and {max_price}.")
+
+
+STRATEGIES = Strategy._registry
