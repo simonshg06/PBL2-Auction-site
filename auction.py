@@ -1,5 +1,5 @@
 import csv
-from BST import BidBST
+from BST import BidBst
 
 
 def bid_cost(price, base_cost=1.0, alpha=10.0):
