@@ -146,3 +146,43 @@ def human_vs_bots():
         you = " ← YOU" if pname == name else ""
         print(f"  {i}. {pname:<14} {wins[pname]:>5}  {total_profit[pname]:>13.2f}{you}")
     press_enter()
+
+# ── MAIN MENU ────────────────────────────────────────────
+MENU = [
+    ("Demo auction round (random bids)",     demo_round),
+    ("BST successor / predecessor explorer", bst_demo),
+    ("Run simulation (bots only)",           run_simulation),
+    ("Play against the bots",                human_vs_bots),
+    ("Exit",                                 None),
+]
+ 
+def main():
+    print("\n" + "═" * 45)
+    print("   LowBid — Lowest Unique Bid Wins")
+    print("═" * 45)
+    print("  Winner = lowest bid chosen by exactly 1 person.")
+    print("  Cost   = base_cost + alpha / (price + 1)")
+    print("═" * 45)
+ 
+    while True:
+        print("\n  MAIN MENU")
+        for i, (label, _) in enumerate(MENU, 1):
+            print(f"  {i}. {label}")
+        choice = input("\n  Choose (1-5): ").strip()
+        try:
+            idx = int(choice) - 1
+            if not (0 <= idx < len(MENU)):
+                raise ValueError
+        except ValueError:
+            print("  Please enter a number between 1 and 5.")
+            continue
+        label, action = MENU[idx]
+        if action is None:
+            print("\n  Goodbye!\n")
+            break
+        action()
+ 
+ 
+if __name__ == "__main__":
+    main()
+ 
