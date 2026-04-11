@@ -74,3 +74,31 @@ def run_simulation():
     history      = []
  
     print(f"\n  Running {n} rounds...", end=" ")
+    
+    for r in range(n):
+        auction = AuctionRound(base_cost, alpha)
+        for name, strat in bots:
+            auction.place_bid(name, strat.bid(r, history, base_cost, alpha, max_price))
+        winner = auction.resolve()
+        total_rev += auction.seller_revenue
+        if winner is None:
+            no_winner += 1
+        for name, _ in bots:
+            cost = auction.costs.get(name, 0.0)
+            total_spent[name] += cost
+            if winner and winner[1] == name:
+                wins[name]         += 1
+                total_profit[name] += winner[0] - cost
+            else:
+                total_profit[name] -= cost
+        history.append(auction.analysis())
+    print("done!\n")
+ 
+    print(f"  No winner:     {no_winner} rounds ({100*no_winner/n:.1f}%)")
+    print(f"  Total revenue: {total_rev:.2f}  (avg {total_rev/n:.2f}/round)")
+    print(f"\n  {'Player':<14} {'Wins':>5} {'Win%':>6} {'Avg Spent':>10} {'Total Profit':>13}")
+    print("  " + "─" * 52)
+    for name, _ in sorted(bots, key=lambda x: wins[x[0]], reverse=True):
+        print(f"  {name:<14} {wins[name]:>5} {100*wins[name]/n:>5.1f}%"
+              f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")
+    press_enter()
