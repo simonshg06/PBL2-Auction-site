@@ -49,3 +49,28 @@ def bst_demo():
             print("  Please type a whole number.")
  
     press_enter()
+
+# ── OPTION 3: Automated simulation ───────────────────────
+def run_simulation():
+    separator("Multi-Round Simulation")
+    try:
+        n = int(input("  How many rounds? [500]: ").strip() or "500")
+    except ValueError:
+        n = 500
+ 
+    bots = [
+        ("DiceRoller", DiceRoller()),
+        ("Cheapskate", Cheapskate()),
+        ("Accountant", Accountant()),
+        ("Historian",  Historian()),
+        ("Hipster",    Hipster()),
+    ]
+    base_cost, alpha, max_price = 1.0, 10.0, 20
+    wins         = {name: 0   for name, _ in bots}
+    total_spent  = {name: 0.0 for name, _ in bots}
+    total_profit = {name: 0.0 for name, _ in bots}
+    no_winner    = 0
+    total_rev    = 0.0
+    history      = []
+ 
+    print(f"\n  Running {n} rounds...", end=" ")
