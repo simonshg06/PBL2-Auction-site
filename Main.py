@@ -74,7 +74,7 @@ def run_simulation():
     history      = []
  
     print(f"\n  Running {n} rounds...", end=" ")
-    
+
     for r in range(n):
         auction = AuctionRound(base_cost, alpha)
         for name, strat in bots:
@@ -101,4 +101,48 @@ def run_simulation():
     for name, _ in sorted(bots, key=lambda x: wins[x[0]], reverse=True):
         print(f"  {name:<14} {wins[name]:>5} {100*wins[name]/n:>5.1f}%"
               f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")
+    press_enter()
+
+# ── OPTION 4: Human vs bots ──────────────────────────────
+def human_vs_bots():
+    separator("Human vs Bots")
+    name  = input("  Your name: ").strip() or "Player"
+    human = Human(name)
+    bots  = [("Bot_Dice",  DiceRoller()), ("Bot_Cheap", Cheapskate()),
+             ("Bot_Acc",   Accountant()), ("Bot_Hip",   Hipster())]
+    all_players = [(name, human)] + bots
+    base_cost, alpha, max_price, n_rounds = 1.0, 10.0, 20, 5
+ 
+    wins         = {p: 0   for p, _ in all_players}
+    total_profit = {p: 0.0 for p, _ in all_players}
+    history      = []
+ 
+    print(f"\n  {n_rounds} rounds. Lowest UNIQUE bid wins.")
+    print(f"  Cost = {base_cost} + {alpha} / (price + 1)\n")
+ 
+    for r in range(n_rounds):
+        separator(f"Round {r+1}/{n_rounds}")
+        auction = AuctionRound(base_cost, alpha)
+        auction.place_bid(name, human.bid(r, history, base_cost, alpha, max_price))
+        for bname, strat in bots:
+            auction.place_bid(bname, strat.bid(r, history, base_cost, alpha, max_price))
+        winner = auction.resolve()
+        auction.summary()
+        for pname, _ in all_players:
+            cost = auction.costs.get(pname, 0.0)
+            if winner and winner[1] == pname:
+                wins[pname]         += 1
+                total_profit[pname] += winner[0] - cost
+            else:
+                total_profit[pname] -= cost
+        history.append(auction.analysis())
+        if r < n_rounds - 1:
+            press_enter()
+ 
+    separator("Final Scoreboard")
+    print(f"  {'Player':<16} {'Wins':>5} {'Total Profit':>13}")
+    print("  " + "─" * 36)
+    for i, (pname, _) in enumerate(sorted(all_players, key=lambda x: wins[x[0]], reverse=True), 1):
+        you = " ← YOU" if pname == name else ""
+        print(f"  {i}. {pname:<14} {wins[pname]:>5}  {total_profit[pname]:>13.2f}{you}")
     press_enter()
