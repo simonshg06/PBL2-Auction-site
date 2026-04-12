@@ -4,7 +4,7 @@ import math
 
 class Strategy:  # Base class for all bidder types 
     name: str 
-    _registry: dict = {}  # Tracks all strategy types
+    registry: dict = {}  # Tracks all strategy types
 
     def __init_subclass__(cls):  # Auto-registers new strategies
         if hasattr(cls, "name"):
