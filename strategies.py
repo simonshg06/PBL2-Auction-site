@@ -8,7 +8,7 @@ class Strategy:  # Base class for all bidder types
 
     def __init_subclass__(cls):  # Auto-registers new strategies
         if hasattr(cls, "name"):
-            Strategy._registry[cls.name.lower()] = cls
+            Strategy.registry[cls.name.lower()] = cls
 
     def bid(self, round_number, history, base_cost, alpha, max_price=20):
         raise NotImplementedError  # To be defined by child classes
@@ -79,4 +79,4 @@ class Human(Strategy):  # Manual input for human players
             except ValueError: pass
             
 
-STRATEGIES = Strategy._registry  # Registry of all usable strategies 
+STRATEGIES = Strategy.registry  # Registry of all usable strategies 
