@@ -1,7 +1,7 @@
 import random
 from auction import AuctionRound, bid_cost
 from BST import BidBst
-from strategies import DiceRoller, Cheapskate, Accountant, Historian, Hipster, Human
+from strategies import DiceRoller, Cheapskate, Accountant, Historian, Human
 
 def separator(title=""):
     print(f"\n── {title} ──" if title else "\n" + "─" * 40)
@@ -10,7 +10,7 @@ def separator(title=""):
 def press_enter():
     input("\n  [Press Enter to continue]")
 
-# ── OPTION 1: Quick demo with random bids ────────────────
+# OPTION 1: Quick demo with random bids 
 def demo_round():
     separator("Demo Auction Round")
     players = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank"]
@@ -25,7 +25,7 @@ def demo_round():
     auction.summary()
     press_enter()
 
-# ── OPTION 2: Show BST successor / predecessor ───────────
+#  OPTION 2: Show BST successor / predecessor 
 def bst_demo():
     separator("BST Successor / Predecessor")
     bst = BidBst()
@@ -50,7 +50,7 @@ def bst_demo():
  
     press_enter()
 
-# ── OPTION 3: Automated simulation ───────────────────────
+#  OPTION 3: Automated simulation
 def run_simulation():
     separator("Multi-Round Simulation")
     try:
@@ -63,7 +63,7 @@ def run_simulation():
         ("Cheapskate", Cheapskate()),
         ("Accountant", Accountant()),
         ("Historian",  Historian()),
-        ("Hipster",    Hipster()),
+        
     ]
     base_cost, alpha, max_price = 1.0, 10.0, 20
     wins         = {name: 0   for name, _ in bots}
@@ -103,13 +103,13 @@ def run_simulation():
               f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")
     press_enter()
 
-# ── OPTION 4: Human vs bots ──────────────────────────────
+#  OPTION 4: Human vs bots 
 def human_vs_bots():
     separator("Human vs Bots")
     name  = input("  Your name: ").strip() or "Player"
     human = Human(name)
     bots  = [("Bot_Dice",  DiceRoller()), ("Bot_Cheap", Cheapskate()),
-             ("Bot_Acc",   Accountant()), ("Bot_Hip",   Hipster())]
+             ("Bot_Acc",   Accountant()), ]
     all_players = [(name, human)] + bots
     base_cost, alpha, max_price, n_rounds = 1.0, 10.0, 20, 5
  
@@ -147,7 +147,7 @@ def human_vs_bots():
         print(f"  {i}. {pname:<14} {wins[pname]:>5}  {total_profit[pname]:>13.2f}{you}")
     press_enter()
 
-# ── MAIN MENU ────────────────────────────────────────────
+#  MAIN MENU 
 MENU = [
     ("Demo auction round (random bids)",     demo_round),
     ("BST successor / predecessor explorer", bst_demo),
