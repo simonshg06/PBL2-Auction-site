@@ -10,7 +10,7 @@ def separator(title=""):
 def press_enter():
     input("\n  [Press Enter to continue]")
 
-# ── OPTION 1: Quick demo with random bids ────────────────
+# OPTION 1: Quick demo with random bids 
 def demo_round():
     separator("Demo Auction Round")
     players = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank"]
@@ -25,7 +25,7 @@ def demo_round():
     auction.summary()
     press_enter()
 
-# ── OPTION 2: Show BST successor / predecessor ───────────
+#  OPTION 2: Show BST successor / predecessor 
 def bst_demo():
     separator("BST Successor / Predecessor")
     bst = BidBst()
@@ -50,7 +50,7 @@ def bst_demo():
  
     press_enter()
 
-# ── OPTION 3: Automated simulation ───────────────────────
+#  OPTION 3: Automated simulation
 def run_simulation():
     separator("Multi-Round Simulation")
     try:
@@ -103,7 +103,7 @@ def run_simulation():
               f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")
     press_enter()
 
-# ── OPTION 4: Human vs bots ──────────────────────────────
+#  OPTION 4: Human vs bots 
 def human_vs_bots():
     separator("Human vs Bots")
     name  = input("  Your name: ").strip() or "Player"
@@ -147,7 +147,7 @@ def human_vs_bots():
         print(f"  {i}. {pname:<14} {wins[pname]:>5}  {total_profit[pname]:>13.2f}{you}")
     press_enter()
 
-# ── MAIN MENU ────────────────────────────────────────────
+#  MAIN MENU 
 MENU = [
     ("Demo auction round (random bids)",     demo_round),
     ("BST successor / predecessor explorer", bst_demo),
