@@ -10,8 +10,6 @@ class Strategy:  # Base class for all bidder types
         if hasattr(cls, "name"):
             Strategy.registry[cls.name.lower()] = cls
 
-    def bid(self, round_number, history, base_cost, alpha, max_price=20):
-        raise NotImplementedError  # To be defined by child classes
     
 
 class DiceRoller(Strategy):  # Pure random bidding 
