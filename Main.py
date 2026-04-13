@@ -1,54 +1,54 @@
-import random
+import random # for generating random bids in the demo
 from auction import AuctionRound, bid_cost
 from BST import BidBst
 from strategies import DiceRoller, Cheapskate, Accountant, Historian, Human
 
-def separator(title=""):
-    print(f"\n── {title} ──" if title else "\n" + "─" * 40)
+def separator(title=""): #optional title
+    print(f"\n── {title} ──" if title else "\n" + "─" * 40) # if no title, plain line of 40 dashes is printed
  
  
 def press_enter():
-    input("\n  [Press Enter to continue]")
+    input("\n  [Press Enter to continue]") # waits for the user to press enter
 
 # OPTION 1: Quick demo with random bids 
 def demo_round():
-    separator("Demo Auction Round")
-    players = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank"]
-    auction = AuctionRound(base_cost=1.0, alpha=10.0)
+    separator("Demo Auction Round") # prints a separating line with the title "Demo Auction Round"
+    players = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank"] # list of player names for the demo
+    auction = AuctionRound(base_cost=1.0, alpha=10.0)  # creates a new auction round with specified base cost and alpha parameters for the cost function
  
-    for player in players:
-        price = random.randint(0, 15)
-        auction.place_bid(player, price)
-        print(f"  {player:<10} bids {price:>2}  (cost: {bid_cost(price, 1.0, 10.0):.2f})")
+    for player in players:  # loops through each player in the list of players
+        price = random.randint(0, 15)  # generates a random bid price between 0 and 15
+        auction.place_bid(player, price)  #calls place_bid from auction.py which inserts the bid into the BST
+        print(f"  {player:<10} bids {price:>2}  (cost: {bid_cost(price, 1.0, 10.0):.2f})") #player:<10 alligns the player name to the left with a width of 10 charac, price:>2 allings price to the right with a width of 2 charac
  
-    auction.resolve()
-    auction.summary()
-    press_enter()
+    auction.resolve() # calls resolve from auction to find the winner based on the lowest unique bid
+    auction.summary() # calls summary to print the results of the auction round 
+    press_enter() # waits for enter to be pressed before returning to the main menu
 
 #  OPTION 2: Show BST successor / predecessor 
 def bst_demo():
-    separator("BST Successor / Predecessor")
-    bst = BidBst()
-    for price, player in [(1,"A"),(5,"B"),(3,"C"),(8,"D"),(2,"E"),(7,"F"),(10,"G")]:
-        bst.insert(price, player)
+    separator("BST Successor / Predecessor") # prints a separating line with the title "BST Successor / Predecessor"
+    bst = BidBst() # creates a new empty BST
+    for price, player in [(1,"A"),(5,"B"),(3,"C"),(8,"D"),(2,"E"),(7,"F"),(10,"G")]: # list of (price, player) pairs to insert into the BST
+        bst.insert(price, player) # inserts each price and player pair into the bst using insert defined in BST
  
-    bst.display()
+    bst.display() # calls display from BST to print the prices using inorder traversal
     print("\n  Successor   = next higher price in the BST.")
     print("  Predecessor = next lower price in the BST.")
     print("  Useful: if the lowest bid is not unique, jump to its successor.")
  
-    while True:
-        raw = input("\n  Enter a price to query (or 'q' to quit): ").strip()
-        if raw.lower() == "q":
-            break
-        try:
-            p = int(raw)
-            print(f"    Successor   of {p}: {bst.successor(p)}")
-            print(f"    Predecessor of {p}: {bst.predecessor(p)}")
-        except ValueError:
+    while True:  # continuously running loop
+        raw = input("\n  Enter a price to query (or 'q' to quit): ").strip() # strip removes any extra spaces after user inputs
+        if raw.lower() == "q": # lower converts capital letters to lowercase
+            break # if q is entered then the loop breaks and we return to the main menu
+        try: #attempts to run the next 3 lines of code
+            p = int(raw) # turns the input into an integer
+            print(f"    Successor   of {p}: {bst.successor(p)}") #successor defined in BST finds the next higher price in the BST and returns a tuple of (price, player) or None
+            print(f"    Predecessor of {p}: {bst.predecessor(p)}") #predecessor defined in BST finds the next lower price in the BST and returns a tuple of (price, player) or None
+        except ValueError: # if the input cannotbe converted, the except element raises the value error and prints the message
             print("  Please type a whole number.")
  
-    press_enter()
+    press_enter() #waits for the enter button to be pressed 
 
 #  OPTION 3: Automated simulation
 def run_simulation():
