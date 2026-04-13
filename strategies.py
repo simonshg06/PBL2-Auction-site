@@ -30,7 +30,7 @@ class Accountant(Strategy):  # Maximizes (Price - Bid Cost)
     name = "Accountant"
     def bid(self, round_number, history, base_cost, alpha, max_price=20):
         def score(p):  # Economic rationalization logic 
-            return p - (base_cost + alpha / (p + 1)) + random.gauss(0, 0.5)
+            return p - (base_cost + alpha / (p + 1)) 
         return max(range(max_price + 1), key=score)
     
 
@@ -47,18 +47,6 @@ class Historian(Strategy):  # Bids near previous winning prices
         base = random.choices(list(win_freq), weights=win_freq.values())[0]
         return max(0, min(max_price, base + random.randint(-2, 2)))
     
-
-class Hipster(Strategy):  # Avoids popular prices to stay unique 
-    name = "Hipster"
-    def bid(self, round_number, history, base_cost, alpha, max_price=20):
-        if not history: return random.randint(0, max_price)
-        price_freq = {}
-        for r in history[-20:]:  # Analyzes price distribution 
-            for price, count in r.get("price_distribution", {}).items():
-                price_freq[price] = price_freq.get(price, 0) + count
-        all_prices = sorted(range(max_price + 1), key=lambda p: price_freq.get(p, 0))
-        cutoff = max(1, (max_price + 1) // 3)
-        return random.choice(all_prices[:cutoff])  # Picks from least used prices
     
 
 class Human(Strategy):  # Manual input for human players 

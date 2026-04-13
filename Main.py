@@ -1,7 +1,7 @@
 import random
 from auction import AuctionRound, bid_cost
 from BST import BidBst
-from strategies import DiceRoller, Cheapskate, Accountant, Historian, Hipster, Human
+from strategies import DiceRoller, Cheapskate, Accountant, Historian, Human
 
 def separator(title=""):
     print(f"\n── {title} ──" if title else "\n" + "─" * 40)
@@ -63,7 +63,7 @@ def run_simulation():
         ("Cheapskate", Cheapskate()),
         ("Accountant", Accountant()),
         ("Historian",  Historian()),
-        ("Hipster",    Hipster()),
+        
     ]
     base_cost, alpha, max_price = 1.0, 10.0, 20
     wins         = {name: 0   for name, _ in bots}
