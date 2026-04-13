@@ -109,7 +109,7 @@ def human_vs_bots():
     name  = input("  Your name: ").strip() or "Player"
     human = Human(name)
     bots  = [("Bot_Dice",  DiceRoller()), ("Bot_Cheap", Cheapskate()),
-             ("Bot_Acc",   Accountant()), ("Bot_Hip",   Hipster())]
+             ("Bot_Acc",   Accountant()), ]
     all_players = [(name, human)] + bots
     base_cost, alpha, max_price, n_rounds = 1.0, 10.0, 20, 5
  
