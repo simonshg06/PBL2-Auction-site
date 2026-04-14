@@ -149,7 +149,7 @@ How can a user verify the code works?
 
 Run python main.py and try each menu option:
 
-Demo Round —-> 8 players bid randomly. Check that the winner has a unique bid.
+Demo Round —-> players bid randomly. Check that the winner has a unique bid.
 BST Explorer —-> Query a price and verify successor/predecessor show correct next prices.
 Simulation —->Run 100 rounds. Revenue should increase, BST health should show ✓ Healthy.
 Human vs Bots —-> Play 5 rounds. Verify costs decrease as you bid higher .
