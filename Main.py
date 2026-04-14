@@ -147,7 +147,7 @@ def human_vs_bots():
     total_profit = {p: 0.0 for p, _ in all_players}
     history = []
 
-    # FIX 1: Join only the NAMES of the players, not the full tuples
+    
     opponent_names = [name for name, strat in csv_players]
     print(f"\n  {n_rounds} rounds. Lowest UNIQUE bid wins.")
     print(f"  Opponents loaded: {', '.join(opponent_names)}") 
@@ -157,10 +157,10 @@ def human_vs_bots():
         separator(f"Round {r+1}/{n_rounds}")
         auction = AuctionRound(base_cost, alpha)
         
-        # Human bid
+        
         auction.place_bid(your_name, human.bid(r, history, base_cost, alpha, max_price))
         
-        # Bot bids
+        
         for bname, strat in csv_players:
             auction.place_bid(bname, strat.bid(r, history, base_cost, alpha, max_price=20))
         
