@@ -4,9 +4,9 @@ from strategies import Human, DiceRoller, Cheapskate, Accountant, Historian
 import random
 
 
-def assign_strategies(player_names):
-    available = [DiceRoller, Cheapskate, Accountant, Historian]
-    return [(name, random.choice(available)()) for name in player_names]
+def assign_strategies(player_names): # takes a list of player names
+    available = [DiceRoller, Cheapskate, Accountant, Historian] # list of strategy classes
+    return [(name, random.choice(available)()) for name in player_names] #random.choice picks a random strategy from the available list for each player
 
 def separator(title=""): #optional title
     print(f"\n── {title} ──" if title else "\n" + "─" * 40) # if no title, plain line of 40 dashes is printed
@@ -17,18 +17,18 @@ def press_enter():
 
 # OPTION 1: Quick demo with random bids 
 def demo_round():
-    separator("Demo Auction Round")
-    filepath = "lowbid_manche_demo.csv"
-    auction = AuctionRound(base_cost=1.0, alpha=10.0)
+    separator("Demo Auction Round") # prints a separating line with the title "Demo Auction Round"
+    filepath = "lowbid_manche_demo.csv" # the filepath/location of the csv file that will be loaded
+    auction = AuctionRound(base_cost=1.0, alpha=10.0) # creates a new auction round
 
-    try:
-        auction.load_from_csv(filepath)
-        for player, price in auction.bids:
-            print(f"  {player:<10} bids {price:>2}  (cost: {bid_cost(price, 1.0, 10.0):.2f})")
-        auction.resolve()
-        auction.summary()
-    except FileNotFoundError:
-        print(f"  ✗ File '{filepath}' not found.")
+    try: # attempts t run the next 4 lines of code
+        auction.load_from_csv(filepath) # loads the bids from the csv file into the auction file (load from cvs define in auction)
+        for player, price in auction.bids: # for each player and price in the list of bids
+            print(f"  {player:<10} bids {price:>2}  (cost: {bid_cost(price, 1.0, 10.0):.2f})") # prints the player 10 characters to the left, price 2 characters to the right and the bid cost to 2 decimals
+        auction.resolve() # finds the winner of the auction round (resolve defined in auction)
+        auction.summary() # prints the summary of the auction round, including the winner and the revenue (summary defined in auction)
+    except FileNotFoundError: # if try fails then this code is run
+        print(f"  ✗ File '{filepath}' not found.") # prints an error message if the file is not found at the specified location
 
     press_enter()
 
