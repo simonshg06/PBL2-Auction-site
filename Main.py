@@ -1,7 +1,13 @@
-import random # for generating random bids in the demo
 from auction import AuctionRound, bid_cost
 from BST import BidBst
-from strategies import DiceRoller, Cheapskate, Accountant, Historian, Human
+from strategies import Human, DiceRoller, Cheapskate, Accountant, Historian
+import random
+
+
+def assign_strategies(player_names):
+    """Randomly assigns a strategy to each CSV player."""
+    available = [DiceRoller, Cheapskate, Accountant, Historian]
+    return [(name, random.choice(available)()) for name in player_names]
 
 def separator(title=""): #optional title
     print(f"\n── {title} ──" if title else "\n" + "─" * 40) # if no title, plain line of 40 dashes is printed
@@ -12,18 +18,20 @@ def press_enter():
 
 # OPTION 1: Quick demo with random bids 
 def demo_round():
-    separator("Demo Auction Round") # prints a separating line with the title "Demo Auction Round"
-    players = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank"] # list of player names for the demo
-    auction = AuctionRound(base_cost=1.0, alpha=10.0)  # creates a new auction round with specified base cost and alpha parameters for the cost function
- 
-    for player in players:  # loops through each player in the list of players
-        price = random.randint(0, 15)  # generates a random bid price between 0 and 15
-        auction.place_bid(player, price)  #calls place_bid from auction.py which inserts the bid into the BST
-        print(f"  {player:<10} bids {price:>2}  (cost: {bid_cost(price, 1.0, 10.0):.2f})") #player:<10 alligns the player name to the left with a width of 10 charac, price:>2 allings price to the right with a width of 2 charac
- 
-    auction.resolve() # calls resolve from auction to find the winner based on the lowest unique bid
-    auction.summary() # calls summary to print the results of the auction round 
-    press_enter() # waits for enter to be pressed before returning to the main menu
+    separator("Demo Auction Round")
+    filepath = "lowbid_manche_demo.csv"
+    auction = AuctionRound(base_cost=1.0, alpha=10.0)
+
+    try:
+        auction.load_from_csv(filepath)
+        for player, price in auction.bids:
+            print(f"  {player:<10} bids {price:>2}  (cost: {bid_cost(price, 1.0, 10.0):.2f})")
+        auction.resolve()
+        auction.summary()
+    except FileNotFoundError:
+        print(f"  ✗ File '{filepath}' not found.")
+
+    press_enter()
 
 #  OPTION 2: Show BST successor / predecessor 
 def bst_demo():
@@ -53,37 +61,47 @@ def bst_demo():
 #  OPTION 3: Automated simulation
 def run_simulation():
     separator("Multi-Round Simulation")
+    filepath = "lowbid_manche_demo.csv"
+
+    try:
+        probe = AuctionRound(base_cost=1.0, alpha=10.0)
+        probe.load_from_csv(filepath)
+    except FileNotFoundError:
+        print(f"  ✗ File '{filepath}' not found.")
+        press_enter()
+        return
+
+    player_names = [player for player, _ in probe.bids]
+    bots = assign_strategies(player_names)  # each player gets a strategy
+
+    print("\n  Player strategy assignments:")
+    for name, strat in bots:
+        print(f"    {name:<14} → {strat.name}")
+
     try:
         n = int(input("  How many rounds? [500]: ").strip() or "500")
     except ValueError:
         n = 500
- 
-    bots = [
-        ("DiceRoller", DiceRoller()),
-        ("Cheapskate", Cheapskate()),
-        ("Accountant", Accountant()),
-        ("Historian",  Historian()),
-        
-    ]
-    base_cost, alpha, max_price = 1.0, 10.0, 20
-    wins         = {name: 0   for name, _ in bots}
-    total_spent  = {name: 0.0 for name, _ in bots}
-    total_profit = {name: 0.0 for name, _ in bots}
+
+    base_cost, alpha = 1.0, 10.0
+    wins         = {name: 0   for name in player_names}
+    total_spent  = {name: 0.0 for name in player_names}
+    total_profit = {name: 0.0 for name in player_names}
     no_winner    = 0
     total_rev    = 0.0
     history      = []
- 
+
     print(f"\n  Running {n} rounds...", end=" ")
 
     for r in range(n):
         auction = AuctionRound(base_cost, alpha)
         for name, strat in bots:
-            auction.place_bid(name, strat.bid(r, history, base_cost, alpha, max_price))
+            auction.place_bid(name, strat.bid(r, history, base_cost, alpha, max_price=20))
         winner = auction.resolve()
         total_rev += auction.seller_revenue
         if winner is None:
             no_winner += 1
-        for name, _ in bots:
+        for name in player_names:
             cost = auction.costs.get(name, 0.0)
             total_spent[name] += cost
             if winner and winner[1] == name:
@@ -93,58 +111,86 @@ def run_simulation():
                 total_profit[name] -= cost
         history.append(auction.analysis())
     print("done!\n")
- 
+
     print(f"  No winner:     {no_winner} rounds ({100*no_winner/n:.1f}%)")
     print(f"  Total revenue: {total_rev:.2f}  (avg {total_rev/n:.2f}/round)")
-    print(f"\n  {'Player':<14} {'Wins':>5} {'Win%':>6} {'Avg Spent':>10} {'Total Profit':>13}")
-    print("  " + "─" * 52)
-    for name, _ in sorted(bots, key=lambda x: wins[x[0]], reverse=True):
-        print(f"  {name:<14} {wins[name]:>5} {100*wins[name]/n:>5.1f}%"
+    strat_map = {name: strat.name for name, strat in bots}
+    print(f"\n  {'Player':<14} {'Strat':<12} {'Wins':>5} {'Win%':>6} {'Avg Spent':>10} {'Total Profit':>13}")
+    print("  " + "─" * 78) 
+    for name in sorted(player_names, key=lambda x: wins[x], reverse=True):
+        s_name = strat_map.get(name, "Unknown")
+        print(f"  {name:<14} {s_name:<12} {wins[name]:>5} {100*wins[name]/n:>5.1f}%"
               f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")
+
     press_enter()
 
 #  OPTION 4: Human vs bots 
 def human_vs_bots():
     separator("Human vs Bots")
-    name  = input("  Your name: ").strip() or "Player"
-    human = Human(name)
-    bots  = [("Bot_Dice",  DiceRoller()), ("Bot_Cheap", Cheapskate()),
-             ("Bot_Acc",   Accountant()), ]
-    all_players = [(name, human)] + bots
+    filepath = "lowbid_manche_demo.csv"
+
+    try:
+        probe = AuctionRound(base_cost=1.0, alpha=10.0)
+        probe.load_from_csv(filepath)
+    except FileNotFoundError:
+        print(f"  ✗ File '{filepath}' not found.")
+        press_enter()
+        return
+
+    csv_players = assign_strategies([player for player, _ in probe.bids])
+
+    your_name = input("  Your name: ").strip() or "Player"
+    human = Human(your_name)
     base_cost, alpha, max_price, n_rounds = 1.0, 10.0, 20, 5
- 
-    wins         = {p: 0   for p, _ in all_players}
+
+    all_players = [(your_name, human)] + csv_players
+    wins = {p: 0 for p, _ in all_players}
     total_profit = {p: 0.0 for p, _ in all_players}
-    history      = []
- 
+    history = []
+
+    # FIX 1: Join only the NAMES of the players, not the full tuples
+    opponent_names = [name for name, strat in csv_players]
     print(f"\n  {n_rounds} rounds. Lowest UNIQUE bid wins.")
+    print(f"  Opponents loaded: {', '.join(opponent_names)}") 
     print(f"  Cost = {base_cost} + {alpha} / (price + 1)\n")
- 
+
     for r in range(n_rounds):
         separator(f"Round {r+1}/{n_rounds}")
         auction = AuctionRound(base_cost, alpha)
-        auction.place_bid(name, human.bid(r, history, base_cost, alpha, max_price))
-        for bname, strat in bots:
-            auction.place_bid(bname, strat.bid(r, history, base_cost, alpha, max_price))
+        
+        # Human bid
+        auction.place_bid(your_name, human.bid(r, history, base_cost, alpha, max_price))
+        
+        # Bot bids
+        for bname, strat in csv_players:
+            auction.place_bid(bname, strat.bid(r, history, base_cost, alpha, max_price=20))
+        
         winner = auction.resolve()
         auction.summary()
+        
         for pname, _ in all_players:
             cost = auction.costs.get(pname, 0.0)
             if winner and winner[1] == pname:
-                wins[pname]         += 1
+                wins[pname] += 1
                 total_profit[pname] += winner[0] - cost
             else:
                 total_profit[pname] -= cost
+        
         history.append(auction.analysis())
         if r < n_rounds - 1:
             press_enter()
- 
+
     separator("Final Scoreboard")
     print(f"  {'Player':<16} {'Wins':>5} {'Total Profit':>13}")
     print("  " + "─" * 36)
-    for i, (pname, _) in enumerate(sorted(all_players, key=lambda x: wins[x[0]], reverse=True), 1):
-        you = " ← YOU" if pname == name else ""
-        print(f"  {i}. {pname:<14} {wins[pname]:>5}  {total_profit[pname]:>13.2f}{you}")
+    
+    # FIX 2: Correct sorting key to ensure it looks up the win count properly
+    sorted_players = sorted(all_players, key=lambda x: wins[x[0]], reverse=True)
+    
+    for i, (pname, _) in enumerate(sorted_players, 1):
+        is_you = " ← YOU" if pname == your_name else ""
+        print(f"  {i}. {pname:<14} {wins[pname]:>5}  {total_profit[pname]:>13.2f}{is_you}")
+    
     press_enter()
 
 #  MAIN MENU 
