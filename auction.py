@@ -26,11 +26,11 @@ class AuctionRound:
             self.place_bid(player, price) #inserts each pair into the search tree
 
     def load_from_csv(self, filepath):
-        with open(filepath) as f:
-            reader = csv.reader(f)
-            next(reader)  # skip header row
-            for player, price in reader:
-                self.place_bid(player.strip(), int(price))
+        with open(filepath) as f: # the with statement closes the file after opening it, the f is a filem object 
+            reader = csv.reader(f) # .reader allows us to read the file as a csv and returns rows of lists
+            next(reader)  # skips the first line of the csv, which is the header
+            for player, price in reader: # loops through each pair of player and price in the csv
+                self.place_bid(player.strip(), int(price)) # .strip removes any extra spaces and turns the price into an integer
 
     def resolve(self): 
         res = self.bst.find_lowest_unique() # find lowest price with one bidder (defined in bst), returns a tuple of (price, player)
