@@ -125,70 +125,71 @@ def run_simulation():
 #  OPTION 4: Human vs bots 
 def human_vs_bots():
     separator("Human vs Bots")
-    filepath = "lowbid_manche_demo.csv"
+    filepath = "lowbid_multi_manches_500x40.csv"
 
     try:
         probe = AuctionRound(base_cost=1.0, alpha=10.0)
-        probe.load_from_csv(filepath)
+        probe.load_from_csv(filepath, 1)  # load round 1 to get the 40 player names
     except FileNotFoundError:
         print(f"  ✗ File '{filepath}' not found.")
         press_enter()
         return
 
-    csv_players = assign_strategies([player for player, _ in probe.bids])
+    csv_player_names = [player for player, _ in probe.bids]
 
     your_name = input("  Your name: ").strip() or "Player"
     human = Human(your_name)
-    base_cost, alpha, max_price, n_rounds = 1.0, 10.0, 20, 5
+    base_cost, alpha, max_price = 1.0, 10.0, 20
 
-    all_players = [(your_name, human)] + csv_players
-    wins = {p: 0 for p, _ in all_players}
-    total_profit = {p: 0.0 for p, _ in all_players}
+    try:
+        n_rounds = int(input("  How many rounds? [10]: ").strip() or "10")
+    except ValueError:
+        n_rounds = 10
+
+    all_player_names = [your_name] + csv_player_names
+    wins = {p: 0 for p in all_player_names}
+    total_profit = {p: 0.0 for p in all_player_names}
     history = []
 
-    
-    opponent_names = [name for name, strat in csv_players]
     print(f"\n  {n_rounds} rounds. Lowest UNIQUE bid wins.")
-    print(f"  Opponents loaded: {', '.join(opponent_names)}") 
+    print(f"  You are playing against {len(csv_player_names)} players from the CSV.")
     print(f"  Cost = {base_cost} + {alpha} / (price + 1)\n")
 
-    for r in range(n_rounds):
-        separator(f"Round {r+1}/{n_rounds}")
+    for r in range(1, n_rounds + 1):  # rounds are 1-indexed in the CSV
+        separator(f"Round {r}/{n_rounds}")
         auction = AuctionRound(base_cost, alpha)
-        
-        
+
+        # load the real bids from the CSV for this round
+        auction.load_from_csv(filepath, r)
+
+        # add the human's bid on top
         auction.place_bid(your_name, human.bid(r, history, base_cost, alpha, max_price))
-        
-        
-        for bname, strat in csv_players:
-            auction.place_bid(bname, strat.bid(r, history, base_cost, alpha, max_price=20))
-        
+
         winner = auction.resolve()
         auction.summary()
-        
-        for pname, _ in all_players:
+
+        for pname in all_player_names:
             cost = auction.costs.get(pname, 0.0)
             if winner and winner[1] == pname:
                 wins[pname] += 1
                 total_profit[pname] += winner[0] - cost
             else:
                 total_profit[pname] -= cost
-        
+
         history.append(auction.analysis())
-        if r < n_rounds - 1:
+        if r < n_rounds:
             press_enter()
 
     separator("Final Scoreboard")
     print(f"  {'Player':<16} {'Wins':>5} {'Total Profit':>13}")
     print("  " + "─" * 36)
-    
-    
-    sorted_players = sorted(all_players, key=lambda x: wins[x[0]], reverse=True)
-    
-    for i, (pname, _) in enumerate(sorted_players, 1):
+
+    sorted_players = sorted(all_player_names, key=lambda x: wins[x], reverse=True)[:20]
+
+    for i, pname in enumerate(sorted_players, 1):
         is_you = " ← YOU" if pname == your_name else ""
         print(f"  {i}. {pname:<14} {wins[pname]:>5}  {total_profit[pname]:>13.2f}{is_you}")
-    
+
     press_enter()
 
 #  MAIN MENU 
