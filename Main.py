@@ -59,18 +59,18 @@ def bst_demo():
 
 #  OPTION 3: Automated simulation
 def run_simulation():
-    separator("Multi-Round Simulation")
-    filepath = "lowbid_manche_demo.csv"
+    separator("Multi-Round Simulation") # prints a separating line with the title "Multi-Round Simulation"
+    filepath = "lowbid_manche_demo.csv" # the filepath/location of the csv file that will be loaded to get the player names for the simulation, the actual bids from the csv are not used in this simulation, only the player names are used to assign strategies to each player
 
     try:
-        probe = AuctionRound(base_cost=1.0, alpha=10.0)
-        probe.load_from_csv(filepath)
+        probe = AuctionRound(base_cost=1.0, alpha=10.0) # creates a new auction round to be used as a probe to load the player names from the csv file, the base cost and alpha parameters are not important for this probe since we are only using it to load the player names
+        probe.load_from_csv(filepath) # loads the bids from the csv file into the probe auction round, this is done to get the player names from the csv file so that we can assign strategies to each player in the simulation
     except FileNotFoundError:
-        print(f"  ✗ File '{filepath}' not found.")
+        print(f"  ✗ File '{filepath}' not found.") # if the file is not found at the specified location, an error message is printed and the function returns to the main menu
         press_enter()
         return 
 
-    player_names = [player for player, _ in probe.bids]
+    player_names = [player for player, _ in probe.bids] # creates a list of player names by iterating through the list of bids in the probe auction round, we only take the player name and ignore the price (hence the underscore) since we only need the player names to assign strategies for the simulation
     bots = assign_strategies(player_names)  # each player gets a strategy
 
     print("\n  Player strategy assignments:") # prints the header for the player strategy assignments
@@ -93,33 +93,33 @@ def run_simulation():
     print(f"\n  Running {n} rounds...", end=" ") # prints the amount of rounds being run, end=" " keeps what we just printed on the same line as the "done!" that is printed at the end of the simulation
 
     for r in range(n):
-        auction = AuctionRound(base_cost, alpha)
-        for name, strat in bots:
-            auction.place_bid(name, strat.bid(r, history, base_cost, alpha, max_price=20))
-        winner = auction.resolve()
-        total_rev += auction.seller_revenue
-        if winner is None:
-            no_winner += 1
-        for name in player_names:
-            cost = auction.costs.get(name, 0.0)
-            total_spent[name] += cost
-            if winner and winner[1] == name:
-                wins[name]         += 1
-                total_profit[name] += winner[0] - cost
+        auction = AuctionRound(base_cost, alpha) # creates a new auction round for each round of the simulation with the specified base cost and alpha parameters
+        for name, strat in bots: # for each player name and strategy in the list of bots
+            auction.place_bid(name, strat.bid(r, history, base_cost, alpha, max_price=20)) # each bot places a bid using their strategy's bid method
+        winner = auction.resolve() # finds the winner of the auction round using the resolve method defined in auction, which returns a tuple of (price, player) for the winning bid or None if there is no winner
+        total_rev += auction.seller_revenue # adds the revenue from this round to the total revenue counter, seller_revenue is updated in the place_bid method defined in auction each time a bid is placed, so by the end of the round it contains the total revenue for that round
+        if winner is None: # if there is no winner for this round, we increment the no_winner counter by 1
+            no_winner += 1 # we increment the no_winner counter by 1
+        for name in player_names: # for each player name in the list of player names
+            cost = auction.costs.get(name, 0.0) # we get the total cost for this player from the auction round's costs dictionary, if the player did not place any bids then we default to 0.0  
+            total_spent[name] += cost # we add the cost for this round to the total amount spent for this player
+            if winner and winner[1] == name: # if there is a winner and the winner's name matches this player name, then we increment the wins counter for this player by 1 and add the profit from this round to their total profit. The profit is calculated as the winning price (winner[0]) minus the total cost for this player.
+                wins[name]         += 1  # increment the wins counter for this player by 1
+                total_profit[name] += winner[0] - cost # add the profit from this round to the total profit for this player, profit is calculated as the winning price (winner[0]) minus the total cost for this player (cost)
             else:
                 total_profit[name] -= cost # if this player is not the winner, we subtract the cost of this round from their total profit 
         history.append(auction.analysis()) # adds the analysis of this round to the history list, analysis defined in auction returns a dictionary with stats about the round
     print("done!\n") # this is printed at the end of the simulation to show that it is finished
 
-    print(f"  No winner:     {no_winner} rounds ({100*no_winner/n:.1f}%)")
-    print(f"  Total revenue: {total_rev:.2f}  (avg {total_rev/n:.2f}/round)")
-    strat_map = {name: strat.name for name, strat in bots}
-    print(f"\n  {'Player':<14} {'Strat':<12} {'Wins':>5} {'Win%':>6} {'Avg Spent':>10} {'Total Profit':>13}")
-    print("  " + "─" * 78) 
-    for name in sorted(player_names, key=lambda x: wins[x], reverse=True):
-        s_name = strat_map.get(name, "Unknown")
-        print(f"  {name:<14} {s_name:<12} {wins[name]:>5} {100*wins[name]/n:>5.1f}%"
-              f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")
+    print(f"  No winner:     {no_winner} rounds ({100*no_winner/n:.1f}%)") # prints the number of rounds with no winner and the percentage of rounds with no winner out of the total rounds
+    print(f"  Total revenue: {total_rev:.2f}  (avg {total_rev/n:.2f}/round)") # prints the total revenue for the seller across all rounds and the average revenue per round, both to 2 decimal places
+    strat_map = {name: strat.name for name, strat in bots} # creates a dictionary mapping each player name to their strategy name for easy lookup when printing the final results
+    print(f"\n  {'Player':<14} {'Strat':<12} {'Wins':>5} {'Win%':>6} {'Avg Spent':>10} {'Total Profit':>13}") # prints the header for the final results table, with columns for Player, Strategy, Wins, Win Percentage, Average Spent, and Total Profit. 
+    print("  " + "─" * 78)  # prints a separating line under the header, 78 characters long to match the width of the table
+    for name in sorted(player_names, key=lambda x: wins[x], reverse=True): # sorts the player names based on the number of wins in descending order
+        s_name = strat_map.get(name, "Unknown") # looks up the strategy name for this player from the strat_map dictionary, defaults to "Unknown" if the player name is not found
+        print(f"  {name:<14} {s_name:<12} {wins[name]:>5} {100*wins[name]/n:>5.1f}%" # prints the player name, strategy, number of wins, win percentage
+              f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")  # prints the average amount spent per round for this player (total spent divided by number of rounds) to 3 decimal places, and the total profit for this player to 2 decimal places
 
     press_enter()
 
