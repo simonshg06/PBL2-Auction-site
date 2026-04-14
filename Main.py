@@ -5,7 +5,6 @@ import random
 
 
 def assign_strategies(player_names):
-    """Randomly assigns a strategy to each CSV player."""
     available = [DiceRoller, Cheapskate, Accountant, Historian]
     return [(name, random.choice(available)()) for name in player_names]
 
@@ -184,7 +183,7 @@ def human_vs_bots():
     print(f"  {'Player':<16} {'Wins':>5} {'Total Profit':>13}")
     print("  " + "─" * 36)
     
-    # FIX 2: Correct sorting key to ensure it looks up the win count properly
+    
     sorted_players = sorted(all_players, key=lambda x: wins[x[0]], reverse=True)
     
     for i, (pname, _) in enumerate(sorted_players, 1):
