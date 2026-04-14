@@ -200,35 +200,35 @@ MENU = [
     ("Run simulation (bots only)",           run_simulation),
     ("Play against the bots",                human_vs_bots),
     ("Exit",                                 None),
-]
+] # list of menu options, each option is a tuple of (label, action) where label is the text to display for the menu option and action is the function to call when that option is selected.
  
 def main():
-    print("\n" + "═" * 45)
-    print("   LowBid — Lowest Unique Bid Wins")
-    print("═" * 45)
-    print("  Winner = lowest bid chosen by exactly 1 person.")
-    print("  Cost   = base_cost + alpha / (price + 1)")
-    print("═" * 45)
+    print("\n" + "═" * 45) # prints a line of 45 "═" characters as a header decoration
+    print("   LowBid — Lowest Unique Bid Wins") # prints the title of the game
+    print("═" * 45) # prints another line of 45 "═" characters as a header decoration
+    print("  Winner = lowest bid chosen by exactly 1 person.") # prints the rules of the game, the winning bid is the lowest bid that is placed by exactly one person
+    print("  Cost   = base_cost + alpha / (price + 1)") # prints the cost function for placing a bid 
+    print("═" * 45) # prints another line of 45 "═" characters as a header decoration
  
-    while True:
-        print("\n  MAIN MENU")
-        for i, (label, _) in enumerate(MENU, 1):
-            print(f"  {i}. {label}")
-        choice = input("\n  Choose (1-5): ").strip()
+    while True: # continuously running loop for the main menu
+        print("\n  MAIN MENU") # prints the header for the main menu
+        for i, (label, _) in enumerate(MENU, 1): # loops through the menu options with i as the index starting from 1. enumerate is used to get both the index and the label for each menu option
+            print(f"  {i}. {label}") # prints the menu option number (i) and the label for each menu option
+        choice = input("\n  Choose (1-5): ").strip() # prompts the user to choose a menu option by entering a number between 1 and 5, strip removes any extra spaces from the input
         try:
-            idx = int(choice) - 1
-            if not (0 <= idx < len(MENU)):
+            idx = int(choice) - 1 # converts the user's choice to an integer and subtracts 1 to get the corresponding index in the MENU list
+            if not (0 <= idx < len(MENU)): # checks if the index is within the valid range of menu options
                 raise ValueError
         except ValueError:
-            print("  Please enter a number between 1 and 5.")
-            continue
-        label, action = MENU[idx]
-        if action is None:
-            print("\n  Goodbye!\n")
-            break
-        action()
+            print("  Please enter a number between 1 and 5.") # if the user's input is not a valid integer or is out of range, a ValueError is raised
+            continue # continue is used to skip the rest of the loop and prompt the user again for a valid input
+        label, action = MENU[idx] # retrieves the label and action for the selected menu option based on the index
+        if action is None: # if the action is None, it means the user selected the "Exit" option
+            print("\n  Goodbye!\n") # prints a goodbye message and exits the program
+            break # breaks the loop to exit the program
+        action() # calls the function associated with the selected menu option to execute the corresponding action
  
  
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": #python sets the __name__ variable to "__main__" which means if the script isnt being imported as a module 
+    main() # calls the main function to start the program
  
