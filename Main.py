@@ -60,18 +60,18 @@ def bst_demo():
 #  OPTION 3: Automated simulation
 def run_simulation():
     separator("Multi-Round Simulation")
-    filepath = "lowbid_manche_demo.csv"
+    filepath = "lowbid_multi_manches_500x40.csv"
 
     try:
         probe = AuctionRound(base_cost=1.0, alpha=10.0)
-        probe.load_from_csv(filepath)
+        probe.load_from_csv(filepath, 1)  # load round 1 just to get the 40 player names
     except FileNotFoundError:
         print(f"  ✗ File '{filepath}' not found.")
         press_enter()
         return
 
     player_names = [player for player, _ in probe.bids]
-    bots = assign_strategies(player_names)  # each player gets a strategy
+    bots = assign_strategies(player_names)
 
     print("\n  Player strategy assignments:")
     for name, strat in bots:
@@ -92,10 +92,9 @@ def run_simulation():
 
     print(f"\n  Running {n} rounds...", end=" ")
 
-    for r in range(n):
+    for r in range(1, n + 1):  # CSV rounds are 1-indexed
         auction = AuctionRound(base_cost, alpha)
-        for name, strat in bots:
-            auction.place_bid(name, strat.bid(r, history, base_cost, alpha, max_price=20))
+        auction.load_from_csv(filepath, r)  # use real bids from CSV
         winner = auction.resolve()
         total_rev += auction.seller_revenue
         if winner is None:
@@ -116,7 +115,7 @@ def run_simulation():
     strat_map = {name: strat.name for name, strat in bots}
     print(f"\n  {'Player':<14} {'Strat':<12} {'Wins':>5} {'Win%':>6} {'Avg Spent':>10} {'Total Profit':>13}")
     print("  " + "─" * 78) 
-    for name in sorted(player_names, key=lambda x: wins[x], reverse=True):
+    for name in sorted(player_names, key=lambda x: wins[x], reverse=True)[:20]:
         s_name = strat_map.get(name, "Unknown")
         print(f"  {name:<14} {s_name:<12} {wins[name]:>5} {100*wins[name]/n:>5.1f}%"
               f"  {total_spent[name]/n:>9.3f}  {total_profit[name]:>13.2f}")

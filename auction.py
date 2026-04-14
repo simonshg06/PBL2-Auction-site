@@ -25,12 +25,14 @@ class AuctionRound:
         for player, price in bid_list: #loops through each pair of player and price in the list of tuples (player, price)
             self.place_bid(player, price) #inserts each pair into the search tree
 
-    def load_from_csv(self, filepath):
-        with open(filepath) as f:
+    def load_from_csv(self, filepath, round_number):
+        with open(filepath, newline='') as f:
             reader = csv.reader(f)
-            next(reader)  # skip header row
-            for player, price in reader:
-                self.place_bid(player.strip(), int(price))
+            next(reader)  # skip header: manche,joueur,prix
+            for row in reader:
+                manche, joueur, prix = row
+                if int(manche) == round_number:
+                    self.place_bid(joueur, int(prix))
 
     def resolve(self): 
         res = self.bst.find_lowest_unique() # find lowest price with one bidder (defined in bst), returns a tuple of (price, player)
