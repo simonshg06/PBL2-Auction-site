@@ -75,4 +75,4 @@ class Simulation:
             print(f"  {name:<14} {strategy.name:<12} {ps.wins:>5} {100*ps.wins/n:>5.1f}% "
                   f"{ps.total_spent/n:>9.3f} {ps.total_profit:>12.2f}")
         print("═" * 55)
-        self._report_bst_health()
+        
