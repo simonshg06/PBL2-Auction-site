@@ -1,11 +1,11 @@
 class BSTNode:     # here our BSTNode will act as a bag that contains all the bets of the same price 
     def __init__(self, price, player):
-        self.price = price  #it places the prices in order, it tells the tree where to place the node(price), lower prices on the right, higher on the left)
+        self.price = price  #it places the prices in order, it tells the tree where to place the node(price), lower prices on the left , higher on the right)
         self.players = [player] #list of all the players that placed a bet of the same amount, if there is only one person in this list, they have the opportunity to win 
         self.left = self.right = None # on left is lower bids and on right is higher bids 
 class BidBst:
     def __init__(self): #this is the top of the tree, when we try to find the winner, we start here and go left as much as we can 
-        self.root = None # initialize hem at zero or none in this case and we will ad d them to the variable 
+        self.root = None # initialize them at zero or none in this case and we will add them to the variable 
         self.total_bids = 0
 
     def insert(self, price, player): # if the bid doesnt exist yet, this function will create a new node for that bid 

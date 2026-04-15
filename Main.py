@@ -126,7 +126,7 @@ def run_simulation():
 #  OPTION 4: Human vs bots 
 def human_vs_bots():
     separator("Human vs Bots") # prints a separating line with the title "Human vs Bots"
-    filepath = "lowbid_manche_demo.csv" # the filepath/location of the csv file that will be loaded to get the player names for the bots
+    filepath = "lowbid_multi_manches_500x40.csv" # the filepath/location of the csv file that will be loaded to get the player names for the bots
 
     try:
         probe = AuctionRound(base_cost=1.0, alpha=10.0) # creates a new auction round 
@@ -185,7 +185,7 @@ def human_vs_bots():
     print(f"  {'Player':<16} {'Wins':>5} {'Total Profit':>13}") # prints the header for the final scoreboard, with columns for Player, Wins, and Total Profit
     print("  " + "─" * 36) # prints a 36 character separator line under the header
 
-    sorted_players = sorted(all_player_names, key=lambda x: wins[x], reverse=True)[:20] # sorts the player names based on the number of wins in descending order and takes the top 20 players for display on the scoreboard
+    sorted_players = sorted(all_player_names, key=lambda x: wins[x], reverse=True)
 
     for i, pname in enumerate(sorted_players, 1): # loops through the sorted list of player names, with i as the index starting from 1 and pname as the player name
         is_you = " ← YOU" if pname == your_name else "" # adds an arrow and "YOU" next to the player's name if it matches the human player's name for easy identification on the scoreboard
