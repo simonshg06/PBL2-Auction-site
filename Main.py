@@ -184,7 +184,7 @@ def human_vs_bots():
     print(f"  {'Player':<16} {'Wins':>5} {'Total Profit':>13}")
     print("  " + "─" * 36)
 
-    sorted_players = sorted(all_player_names, key=lambda x: wins[x], reverse=True)[:20]
+    sorted_players = sorted(all_player_names, key=lambda x: wins[x], reverse=True)
 
     for i, pname in enumerate(sorted_players, 1):
         is_you = " ← YOU" if pname == your_name else ""
