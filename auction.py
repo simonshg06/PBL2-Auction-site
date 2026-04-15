@@ -26,19 +26,17 @@ class AuctionRound:
             self.place_bid(player, price) #inserts each pair into the search tree
 
     def load_from_csv(self, filepath, round_number=None):
-        with open(filepath, newline='') as f:
-            reader = csv.reader(f)
-            next(reader)  # skip header
-            for row in reader:
-                if round_number is None:
-                    # old CSV format: player, price (2 columns)
-                    player, price = row
-                    self.place_bid(player.strip(), int(price))
+        with open(filepath, newline='') as f: # opens the CSV file for reading, newline='' is used to ensure that newlines are handled correctly across different platforms
+            reader = csv.reader(f) # creates a CSV reader object that will iterate over lines in the given file
+            next(reader)  # skip header, this is used to skip the first line of the CSV file
+            for row in reader: # loops through each row in the CSV file
+                if round_number is None: # if no round number is specified, we assume the old format and load all bids
+                    player, price = row # in the old CSV format, there are only 2 columns: player and price, so we unpack the row into these two variables
+                    self.place_bid(player.strip(), int(price)) # we use strip() to remove any leading or trailing whitespace from the player's name, and convert the price to an integer before placing the bid
                 else:
-                    # new CSV format: manche, joueur, prix (3 columns)
-                    manche, joueur, prix = row
-                    if int(manche) == round_number:
-                        self.place_bid(joueur, int(prix))
+                    manche, joueur, prix = row # in the new CSV format, there are 3 columns: manche (round), joueur (player), and prix (price)
+                    if int(manche) == round_number: # we check if the manche (round) matches the specified round number
+                        self.place_bid(joueur, int(prix)) # if it matches, we place the bid for that player and price
 
     def resolve(self): 
         res = self.bst.find_lowest_unique() # find lowest price with one bidder (defined in bst), returns a tuple of (price, player)
