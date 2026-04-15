@@ -76,3 +76,31 @@ class Simulation:
                   f"{ps.total_spent/n:>9.3f} {ps.total_profit:>12.2f}")
         print("═" * 55)
         
+    def _report_bst_health(self):
+        if not self.round_history:
+            return
+        heights = [r["bst_height"] for r in self.round_history]  # extract BST heights from history
+        avg_h = sum(heights) / len(heights)
+        ideal = len(self.players).bit_length() - 1  # log2(n) ideal height
+        warn = avg_h > ideal * 1.5  # warn if avg exceeds 1.5x ideal
+        print(f"\n  BST: avg={avg_h:.2f}, ideal≈{ideal}")
+        print("    " + ("⚠ Degenerate" if warn else "✓ Healthy"))
+        print()
+
+    def compare_parameters(self, alpha_values, n_rounds=200):
+        # sweep over alpha values to find optimal cost function
+        original_alpha = self.alpha
+        results = []
+        for alpha in alpha_values:
+            self.alpha = alpha
+            self._reset_stats()
+            self.run(n_rounds)
+            # collect revenue and wins for each alpha value
+            results.append({
+                "alpha": alpha,
+                "seller_revenue": round(sum(self.seller_revenues), 2),
+                "no_winner_pct": round(100 * self.no_winner_rounds / self.rounds_played, 1),
+                "wins": {name: self.stats[name].wins for name, _ in self.players},  # dict of player wins
+            })
+        self.alpha = original_alpha  # restore original alpha
+        return results
